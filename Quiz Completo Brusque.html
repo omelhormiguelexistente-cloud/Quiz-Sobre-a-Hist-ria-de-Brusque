@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz: Cultura de Brusque!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sky-top:     #5ecbf5;
+      --sky-mid:     #a8e6ff;
+      --grass:       #5db84a;
+      --grass-dark:  #3e8c30;
+      --yellow:      #ffcc00;
+      --orange:      #ff8c00;
+      --red:         #e63232;
+      --green:       #2ecc40;
+      --white:       #ffffff;
+      --card-bg:     rgba(255,255,255,0.94);
+      --shadow:      0 8px 32px rgba(0,0,0,0.18);
+      --radius:      22px;
+      --font-title:  'Baloo 2', cursive;
+      --font-body:   'Nunito', sans-serif;
+      --cat-food:    #e67e22;
+      --cat-culture: #8e44ad;
+      --cat-history: #2980b9;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 52%, var(--grass) 52%, var(--grass-dark) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Fundo */
+    .bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .sun {
+      position: absolute; top: 4%; right: 6%;
+      width: 72px; height: 72px;
+      background: radial-gradient(circle, #ffe566, #ffd700);
+      border-radius: 50%;
+      box-shadow: 0 0 0 12px rgba(255,215,0,.25), 0 0 0 24px rgba(255,215,0,.12);
+      animation: sunPulse 4s ease-in-out infinite;
+    }
+    @keyframes sunPulse {
+      0%,100% { box-shadow: 0 0 0 12px rgba(255,215,0,.25), 0 0 0 24px rgba(255,215,0,.12); }
+      50%      { box-shadow: 0 0 0 18px rgba(255,215,0,.30), 0 0 0 36px rgba(255,215,0,.15); }
+    }
+    .cloud { position: absolute; background: #fff; border-radius: 50px; opacity: .85; animation: driftCloud linear infinite; }
+    .cloud::before, .cloud::after { content:''; position:absolute; background:#fff; border-radius:50%; }
+    .c1 { width:110px;height:36px;top:8%;left:-130px;animation-duration:28s; }
+    .c1::before { width:64px;height:64px;top:-32px;left:14px; }
+    .c1::after  { width:48px;height:48px;top:-24px;left:52px; }
+    .c2 { width:80px;height:26px;top:16%;left:-100px;animation-duration:40s;animation-delay:-14s;opacity:.7; }
+    .c2::before { width:50px;height:50px;top:-25px;left:8px; }
+    .c2::after  { width:36px;height:36px;top:-18px;left:38px; }
+    .c3 { width:130px;height:40px;top:5%;left:-150px;animation-duration:55s;animation-delay:-28s;opacity:.6; }
+    .c3::before { width:74px;height:74px;top:-37px;left:18px; }
+    .c3::after  { width:56px;height:56px;top:-28px;left:60px; }
+    @keyframes driftCloud {
+      from { transform: translateX(0); }
+      to   { transform: translateX(calc(100vw + 200px)); }
+    }
+    .flowers { position:absolute;bottom:0;left:0;width:100%;height:14%;display:flex;align-items:flex-end;gap:14px;padding:0 20px 6px; }
+    .flower  { font-size:1.6rem;animation:sway 3s ease-in-out infinite;transform-origin:bottom center; }
+    .flower:nth-child(2n) { animation-delay:-1s; }
+    .flower:nth-child(3n) { animation-delay:-1.8s;font-size:1.3rem; }
+    .flower:nth-child(5n) { animation-delay:-2.5s;font-size:2rem; }
+    @keyframes sway { 0%,100%{ transform:rotate(-5deg); } 50%{ transform:rotate(5deg); } }
+    .sparkle { position:absolute;font-size:1rem;animation:floatUp 6s ease-in-out infinite;opacity:0; }
+    @keyframes floatUp {
+      0%  { opacity:0;transform:translateY(0) scale(.5); }
+      20% { opacity:1; }
+      80% { opacity:.5; }
+      100%{ opacity:0;transform:translateY(-70px) scale(1.2); }
+    }
+
+    /* Telas */
+    #app { position:relative;z-index:10;width:100%;max-width:530px;padding:14px; }
+    .screen { display:none;animation:fadeUp .4s ease both; }
+    .screen.active { display:flex;flex-direction:column;align-items:center; }
+    @keyframes fadeUp {
+      from { opacity:0;transform:translateY(28px); }
+      to   { opacity:1;transform:translateY(0); }
+    }
+
+    /* Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), inset 0 2px 0 rgba(255,255,255,.7);
+      padding: 24px 24px 20px;
+      width: 100%;
+      text-align: center;
+      border: 3px solid rgba(255,255,255,.7);
+      backdrop-filter: blur(6px);
+    }
+
+    /* Mascote */
+    .mascot { font-size:4.5rem;display:block;margin-bottom:-6px;filter:drop-shadow(0 5px 10px rgba(0,0,0,.2));animation:bounce 2.5s ease-in-out infinite; }
+    @keyframes bounce { 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-10px) rotate(3deg); } }
+    .mascot.happy { animation:mascotHappy .6s ease both; }
+    .mascot.sad   { animation:mascotSad  .5s ease both; }
+    @keyframes mascotHappy { 0%{ transform:scale(1); } 40%{ transform:scale(1.3) rotate(8deg); } 70%{ transform:scale(.97) rotate(-4deg); } 100%{ transform:scale(1); } }
+    @keyframes mascotSad   { 0%,100%{ transform:translateX(0); } 20%,60%{ transform:translateX(-10px) rotate(-5deg); } 40%,80%{ transform:translateX(10px) rotate(5deg); } }
+
+    /* Tipografia */
+    .hero-title {
+      font-family: var(--font-title);
+      font-size: 2rem; font-weight: 800;
+      color: var(--white);
+      text-shadow: 0 3px 0 rgba(0,0,0,.25), 0 0 20px rgba(255,200,0,.5);
+      line-height: 1.15; margin-bottom: 12px;
+    }
+    .hero-title span { color: var(--yellow); }
+    .subtitle { font-family:var(--font-title);font-size:1.2rem;font-weight:700;color:#333;margin-bottom:16px;line-height:1.35; }
+    .q-label {
+      display:inline-block;
+      padding:4px 16px;border-radius:50px;margin-bottom:10px;
+      font-family:var(--font-title);font-size:.82rem;font-weight:700;
+      color:white;box-shadow:0 3px 8px rgba(0,0,0,.15);
+    }
+    .q-label.culinaria { background:linear-gradient(135deg,#e67e22,#f39c12); }
+    .q-label.cultura   { background:linear-gradient(135deg,#8e44ad,#9b59b6); }
+    .q-label.historia  { background:linear-gradient(135deg,#2980b9,#3498db); }
+    .q-text { font-family:var(--font-title);font-size:1.1rem;font-weight:700;color:#222;line-height:1.4;margin-bottom:12px; }
+
+    /* Cards de categoria (intro) */
+    .cat-intro { padding:20px;border-radius:18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;text-align:left;border:2px solid rgba(0,0,0,.08); }
+    .cat-intro.culinaria { background:linear-gradient(135deg,#fff5ec,#ffe0bc); }
+    .cat-intro.cultura   { background:linear-gradient(135deg,#f5eeff,#e8d5ff); }
+    .cat-intro.historia  { background:linear-gradient(135deg,#eaf4ff,#c8e4ff); }
+    .cat-icon { font-size:2.8rem;flex-shrink:0; }
+    .cat-info h3 { font-family:var(--font-title);font-size:1rem;font-weight:800;margin-bottom:2px; }
+    .cat-info p  { font-size:.82rem;color:#555;font-weight:600; }
+    .culinaria h3 { color:#c0580a; }
+    .cultura   h3 { color:#6c3483; }
+    .historia  h3 { color:#1a5276; }
+
+    /* Input */
+    .input-field {
+      width:100%;padding:12px 18px;
+      border:3px solid #e0e0e0;border-radius:50px;
+      font-family:var(--font-body);font-size:1rem;font-weight:600;
+      color:#333;background:#fff;outline:none;text-align:center;
+      transition:border-color .2s,box-shadow .2s;margin-bottom:12px;
+    }
+    .input-field:focus { border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,140,0,.15); }
+    .input-field::placeholder { color:#bbb; }
+
+    /* Botões */
+    .btn {
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px 28px;border:none;border-radius:50px;
+      font-family:var(--font-title);font-size:1rem;font-weight:700;
+      cursor:pointer;transition:transform .15s,box-shadow .15s;letter-spacing:.3px;
+    }
+    .btn:active { transform:scale(.96); }
+    .btn-primary { background:linear-gradient(135deg,#ff8c00,#ffcc00);color:white;box-shadow:0 5px 0 #c96800,0 8px 20px rgba(255,140,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.2); }
+    .btn-primary:hover { transform:translateY(-2px); }
+    .btn-green { background:linear-gradient(135deg,#2ecc40,#27ae2e);color:white;box-shadow:0 5px 0 #1a7a23; }
+    .btn-green:hover { transform:translateY(-2px); }
+    .btn-blue { background:linear-gradient(135deg,#3498db,#2980b9);color:white;box-shadow:0 5px 0 #1c5e8b; }
+    .btn-full { width:100%; }
+
+    /* Progresso */
+    .progress-header { width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px; }
+    .progress-label  { font-family:var(--font-title);font-size:.8rem;font-weight:700;color:white;text-shadow:0 1px 3px rgba(0,0,0,.3); }
+    .progress-wrap   { width:100%;background:rgba(255,255,255,.4);border-radius:50px;height:10px;margin-bottom:12px;overflow:hidden; }
+    .progress-bar    { height:100%;border-radius:50px;transition:width .5s ease,background .4s; }
+    .progress-bar.culinaria { background:linear-gradient(90deg,#e67e22,#f39c12); }
+    .progress-bar.cultura   { background:linear-gradient(90deg,#8e44ad,#9b59b6); }
+    .progress-bar.historia  { background:linear-gradient(90deg,#2980b9,#3498db); }
+
+    /* Imagem da pergunta */
+    .q-image-wrap {
+      width:160px;height:130px;margin:0 auto 14px;
+      border-radius:16px;overflow:hidden;
+      border:4px solid white;box-shadow:0 6px 20px rgba(0,0,0,.18);
+      background:#f5f5f5;display:flex;align-items:center;justify-content:center;
+    }
+    .q-image-wrap img { width:100%;height:100%;object-fit:cover;transition:opacity .3s; }
+    .q-image-wrap .emoji-fallback { font-size:4rem; }
+
+    /* Opções texto */
+    .opts-text { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 4px; }
+    .opts-text.three { grid-template-columns:repeat(3,1fr); }
+    .opt-text {
+      background:white;border:3px solid #e8e8e8;border-radius:14px;
+      padding:12px 8px;cursor:pointer;
+      transition:transform .15s,border-color .15s,box-shadow .15s;
+      font-family:var(--font-title);font-size:.92rem;font-weight:700;
+      color:#333;text-align:center;box-shadow:0 4px 0 #ddd;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .opt-text:hover:not(:disabled) { border-color:var(--orange);transform:translateY(-3px);box-shadow:0 7px 0 #e0a000; }
+
+    /* Opções com imagem */
+    .opts-img { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0 4px; }
+    .opts-img.two { grid-template-columns:repeat(2,1fr); }
+    .opt-img {
+      background:white;border:3px solid #e8e8e8;border-radius:14px;
+      padding:8px 6px 10px;cursor:pointer;
+      transition:transform .15s,border-color .15s,box-shadow .15s;
+      display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 4px 0 #ddd;
+    }
+    .opt-img .opt-photo { width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#f0f0f0; }
+    .opt-img .opt-photo img { width:100%;height:100%;object-fit:cover; }
+    .opt-img .opt-photo .ep { font-size:2.4rem;display:flex;align-items:center;justify-content:center;height:100%; }
+    .opt-img span.opt-name { font-family:var(--font-title);font-size:.78rem;font-weight:700;color:#333;text-align:center;line-height:1.2; }
+    .opt-img:hover:not(:disabled) { border-color:var(--orange);transform:translateY(-3px);box-shadow:0 7px 0 #e0a000; }
+
+    /* Estados certo/errado */
+    .opt-correct { border-color:var(--green)!important;background:#e8fde8!important;box-shadow:0 4px 0 #1a7a23!important;animation:popIn .3s ease both; }
+    .opt-wrong   { border-color:var(--red)!important;  background:#fde8e8!important;box-shadow:0 4px 0 #8b0000!important;animation:shakeIt .4s ease both; }
+    @keyframes popIn  { 0%{ transform:scale(.9); } 60%{ transform:scale(1.07); } 100%{ transform:scale(1); } }
+    @keyframes shakeIt{ 0%,100%{ transform:translateX(0); } 25%,75%{ transform:translateX(-6px); } 50%{ transform:translateX(6px); } }
+
+    /* Feedback */
+    .fb-icon  { font-size:4rem;margin-bottom:4px;animation:fbPop .5s cubic-bezier(.36,1.6,.3,1) both; }
+    @keyframes fbPop { from{ transform:scale(0) rotate(-20deg);opacity:0; } to{ transform:scale(1) rotate(0);opacity:1; } }
+    .fb-title { font-family:var(--font-title);font-size:1.5rem;font-weight:800;line-height:1.2;margin-bottom:8px; }
+    .fb-title.ok  { color:#1a7a23; }
+    .fb-title.err { color:#c0392b; }
+    .fb-tip {
+      font-size:.88rem;font-weight:600;color:#555;
+      background:#f8f8f8;border-radius:12px;
+      padding:10px 14px;margin:0 0 16px;line-height:1.4;
+      border-left:4px solid #ddd;
+    }
+    .fb-tip.ok-tip  { border-color:var(--green); }
+    .fb-tip.err-tip { border-color:var(--red); }
+
+    /* Badge jogador */
+    .player-badge { display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.85);border-radius:50px;padding:5px 14px;font-family:var(--font-body);font-size:.82rem;font-weight:700;color:#555;margin-bottom:10px; }
+    .score-badge  { display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.85);border-radius:50px;padding:5px 14px;font-family:var(--font-title);font-size:.85rem;font-weight:800;color:#333;margin-bottom:10px; }
+
+    /* Transição de seção */
+    .section-banner { border-radius:18px;padding:18px 20px 16px;text-align:center;margin-bottom:14px;width:100%; }
+    .section-banner.culinaria { background:linear-gradient(135deg,#ff9a44,#ffcc00); }
+    .section-banner.cultura   { background:linear-gradient(135deg,#a855f7,#d8b4fe); }
+    .section-banner.historia  { background:linear-gradient(135deg,#3b82f6,#93c5fd); }
+    .section-banner h2 { font-family:var(--font-title);font-size:1.5rem;font-weight:800;color:white;text-shadow:0 2px 4px rgba(0,0,0,.2);margin-bottom:4px; }
+    .section-banner p  { font-size:.88rem;color:rgba(255,255,255,.9);font-weight:600; }
+
+    /* Resultado */
+    .result-title { font-family:var(--font-title);font-size:2.2rem;font-weight:800;color:var(--yellow);text-shadow:0 3px 0 rgba(0,0,0,.2);animation:glow 2s ease-in-out infinite; }
+    @keyframes glow { 0%,100%{ text-shadow:0 3px 0 rgba(0,0,0,.2),0 0 20px rgba(255,200,0,.6); } 50%{ text-shadow:0 3px 0 rgba(0,0,0,.2),0 0 40px rgba(255,200,0,.9); } }
+    .score-row  { display:flex;gap:10px;margin:12px 0;justify-content:center; }
+    .score-chip { border-radius:14px;padding:10px 16px;font-family:var(--font-title);font-weight:800;font-size:1rem;color:white;box-shadow:0 4px 0 rgba(0,0,0,.15); }
+    .chip-food    { background:linear-gradient(135deg,#e67e22,#f39c12); }
+    .chip-culture { background:linear-gradient(135deg,#8e44ad,#9b59b6); }
+    .chip-history { background:linear-gradient(135deg,#2980b9,#3498db); }
+    .chip-total   { background:linear-gradient(135deg,#27ae60,#2ecc71); }
+
+    /* Detalhes */
+    .detail-section  { border-radius:14px;overflow:hidden;margin-bottom:12px; }
+    .detail-header   { padding:8px 14px;font-family:var(--font-title);font-size:.9rem;font-weight:800;color:white; }
+    .detail-header.culinaria { background:var(--cat-food); }
+    .detail-header.cultura   { background:var(--cat-culture); }
+    .detail-header.historia  { background:var(--cat-history); }
+    .detail-row { display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:.82rem;font-weight:600;color:#333;border-bottom:1px solid #f0f0f0;background:white; }
+    .detail-row:last-child { border-bottom:none; }
+    .detail-row.ok  { border-left:4px solid var(--green); }
+    .detail-row.err { border-left:4px solid var(--red); }
+
+    @media(max-width:480px){
+      #app { padding:8px; }
+      .card { padding:18px 14px 16px; }
+      .hero-title { font-size:1.6rem; }
+      .opts-text,.opts-img { gap:8px; }
+      .score-row { flex-wrap:wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg">
+    <div class="sun"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="flowers" id="flowers"></div>
+    <div class="sparkle" style="top:28%;left:7%;animation-delay:0s">⭐</div>
+    <div class="sparkle" style="top:42%;left:91%;animation-delay:1.6s">✨</div>
+    <div class="sparkle" style="top:18%;left:76%;animation-delay:3.1s">⭐</div>
+    <div class="sparkle" style="top:58%;left:14%;animation-delay:2.2s">✨</div>
+  </div>
+
+  <div id="app">
+
+    <!-- Tela 1: Nome -->
+    <div class="screen active" id="s-name">
+      <span class="mascot">🐥</span>
+      <div class="card">
+        <h1 class="hero-title">Teste sobre a cultura de <span>Brusque!</span></h1>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;justify-content:center;">
+          <div class="cat-intro culinaria" style="flex:1;min-width:130px;cursor:default;">
+            <span class="cat-icon">🍽️</span>
+            <div class="cat-info"><h3>Culinária</h3><p>5 perguntas</p></div>
+          </div>
+          <div class="cat-intro cultura" style="flex:1;min-width:130px;cursor:default;">
+            <span class="cat-icon">🎭</span>
+            <div class="cat-info"><h3>Cultura</h3><p>5 perguntas</p></div>
+          </div>
+          <div class="cat-intro historia" style="flex:1;min-width:130px;cursor:default;">
+            <span class="cat-icon">📜</span>
+            <div class="cat-info"><h3>História</h3><p>5 perguntas</p></div>
+          </div>
+        </div>
+        <p class="subtitle">Qual é o seu nome?</p>
+        <input class="input-field" id="inp-name" type="text" placeholder="Digite seu nome..." maxlength="30" />
+        <button class="btn btn-primary btn-full" onclick="goSchool()">Próxima etapa →</button>
+      </div>
+    </div>
+
+    <!-- Tela 2: Escola -->
+    <div class="screen" id="s-school">
+      <span class="mascot">🎒</span>
+      <div class="card">
+        <p class="subtitle">Qual escola você estuda?</p>
+        <input class="input-field" id="inp-school" type="text" placeholder="Nome da sua escola..." maxlength="50" />
+        <button class="btn btn-primary btn-full" onclick="goAge()">Próxima etapa →</button>
+      </div>
+    </div>
+
+    <!-- Tela 3: Idade -->
+    <div class="screen" id="s-age">
+      <span class="mascot">🎂</span>
+      <div class="card">
+        <p class="subtitle">Quantos anos você tem?</p>
+        <input class="input-field" id="inp-age" type="number" placeholder="Sua idade..." min="4" max="18" />
+        <button class="btn btn-primary btn-full" onclick="startQuiz()">Vamos começar! 🎉</button>
+      </div>
+    </div>
+
+    <!-- Tela da Pergunta -->
+    <div class="screen" id="s-question">
+      <div style="display:flex;gap:8px;width:100%;margin-bottom:6px;">
+        <div class="player-badge" style="flex:1;">🐥 <span id="badge-name">Jogador</span></div>
+        <div class="score-badge">⭐ <span id="badge-score">0</span></div>
+      </div>
+      <div class="progress-header">
+        <span class="progress-label" id="prog-label">Pergunta 1 de 15</span>
+        <span class="progress-label" id="prog-cat-label">🍽️ Culinária</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar culinaria" id="progress-bar" style="width:0%"></div>
+      </div>
+      <div class="card">
+        <span class="q-label culinaria" id="q-label">Culinária · P1</span>
+        <p class="q-text" id="q-text"></p>
+        <div id="q-img-wrap"></div>
+        <div id="opts-wrap"></div>
+      </div>
+    </div>
+
+    <!-- Tela de Transição entre Seções -->
+    <div class="screen" id="s-section">
+      <span class="mascot happy">🐥</span>
+      <div class="card">
+        <div class="section-banner culinaria" id="section-banner">
+          <h2 id="section-title">🎭 Agora: Cultura!</h2>
+          <p id="section-desc">Você passou pela Culinária! Vamos ver o quanto você sabe sobre a cultura de Brusque.</p>
+        </div>
+        <div id="section-score-info" style="margin-bottom:16px;font-family:var(--font-title);font-size:.9rem;font-weight:700;color:#555;"></div>
+        <button class="btn btn-primary btn-full" onclick="resumeSection()">Continuar! →</button>
+      </div>
+    </div>
+
+    <!-- Tela de Feedback: Correto -->
+    <div class="screen" id="s-correct">
+      <span class="mascot happy">🐣</span>
+      <div class="card">
+        <div class="fb-icon">✅</div>
+        <h2 class="fb-title ok">Isso aí! Certa Resposta!<br>Continua assim!</h2>
+        <div class="fb-tip ok-tip" id="tip-correct"></div>
+        <button class="btn btn-green btn-full" onclick="nextQ()">Próxima pergunta →</button>
+      </div>
+    </div>
+
+    <!-- Tela de Feedback: Errado -->
+    <div class="screen" id="s-wrong">
+      <span class="mascot sad">😟</span>
+      <div class="card">
+        <div class="fb-icon">❌</div>
+        <h2 class="fb-title err">Hmm… foi quase!<br>Mas não é bem essa resposta!</h2>
+        <div class="fb-tip err-tip" id="tip-wrong"></div>
+        <button class="btn btn-primary btn-full" onclick="nextQ()">Próxima pergunta →</button>
+      </div>
+    </div>
+
+    <!-- Tela de Resultado -->
+    <div class="screen" id="s-result">
+      <div style="font-size:1.8rem;letter-spacing:4px;margin-bottom:6px;">🎉🏆🎊</div>
+      <div class="card">
+        <span class="mascot" style="animation:none">🐥</span>
+        <h1 class="result-title">Parabéns!</h1>
+        <p style="font-family:var(--font-title);font-size:1.1rem;font-weight:700;color:#333;margin:10px 0 4px;">Você terminou o quiz de Brusque!</p>
+        <div class="score-row">
+          <div class="score-chip chip-food">🍽️ <span id="sc-food">0</span>/5</div>
+          <div class="score-chip chip-culture">🎭 <span id="sc-culture">0</span>/5</div>
+          <div class="score-chip chip-history">📜 <span id="sc-history">0</span>/5</div>
+        </div>
+        <div class="score-chip chip-total" style="font-size:1.2rem;padding:12px 24px;margin:4px auto 14px;display:inline-block;">
+          🏆 Total: <span id="sc-total">0</span>/15
+        </div>
+        <p id="result-msg" style="font-size:.88rem;font-weight:600;color:#555;margin-bottom:16px;"></p>
+        <button class="btn btn-blue btn-full" onclick="seeDetails()" style="margin-bottom:10px;">Ver meu desempenho 📋</button>
+        <button class="btn btn-primary btn-full" onclick="restart()">Jogar novamente! 🔄</button>
+      </div>
+    </div>
+
+    <!-- Tela de Desempenho Detalhado -->
+    <div class="screen" id="s-details">
+      <div class="card" style="max-height:80vh;overflow-y:auto;">
+        <h2 style="font-family:var(--font-title);font-size:1.2rem;font-weight:800;margin-bottom:12px;color:#333;">📋 Meu Desempenho</h2>
+        <div id="detail-player" style="background:#f5f5f5;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-weight:700;font-size:.88rem;color:#444;"></div>
+        <div id="detail-content"></div>
+        <br/>
+        <button class="btn btn-primary btn-full" onclick="restart()">Jogar novamente! 🔄</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  // Banco de perguntas — 15 no total, 5 por categoria
+  const QUESTIONS = [
+    /* ── CULINÁRIA (5) ── */
+    {
+      id:1, cat:'culinaria',
+      type:'img-question',
+      text:'Qual é o prato típico símbolo de Brusque, servido na Fenarreco todo outubro?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Fenarreco_Brusque.jpg/640px-Fenarreco_Brusque.jpg',
+      imageFallback:'🦆',
+      options:[
+        {label:'🦆 Marreco Recheado',correct:true},
+        {label:'🍕 Pizza',correct:false},
+        {label:'🥩 Churrasco',correct:false},
+        {label:'🍔 Hambúrguer',correct:false},
+      ],
+      tipCorrect:'Isso mesmo! O Marreco Recheado com repolho roxo é o prato símbolo de Brusque e atrai 150 mil visitantes todo outubro na Fenarreco.',
+      tipWrong:'A resposta certa é o Marreco Recheado! É tão famoso que deu nome à maior festa da cidade: a Fenarreco.'
+    },
+    {
+      id:2, cat:'culinaria',
+      type:'img-options',
+      text:'O Marreco é o prato principal de Brusque. Que tipo de animal é um marreco?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Mallard_drake_and_female.jpg/640px-Mallard_drake_and_female.jpg',
+      imageFallback:'🦆',
+      options:[
+        {label:'Ave',correct:true,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/400px-Camponotus_flavomarginatus_ant.jpg',emoji:'🐦'},
+        {label:'Mamífero',correct:false,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/481px-Cat03.jpg',emoji:'🐱'},
+        {label:'Anfíbio',correct:false,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Litoria_tyleri.jpg/320px-Litoria_tyleri.jpg',emoji:'🐸'},
+      ],
+      tipCorrect:'Perfeito! O marreco é uma ave aquática da família dos Anatídeos, parente do pato doméstico.',
+      tipWrong:'O marreco é uma AVE — mais especificamente uma ave aquática. É parente do pato doméstico!'
+    },
+    {
+      id:3, cat:'culinaria',
+      type:'img-question',
+      text:'Qual é esse bolo típico de herança alemã, muito popular nas padarias de Brusque?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Streuselkuchen_Yum.jpg/640px-Streuselkuchen_Yum.jpg',
+      imageFallback:'🎂',
+      options:[
+        {label:'🎂 Cuca',correct:true},
+        {label:'🍞 Pão de Mel',correct:false},
+        {label:'🥐 Strudel',correct:false},
+        {label:'🍩 Krapfen',correct:false},
+      ],
+      tipCorrect:'Exato! A Cuca (Streuselkuchen) é um bolo de massa macia coberto com farofa doce crocante. Tradição alemã adotada em Brusque!',
+      tipWrong:'Esse bolo é a Cuca (Streuselkuchen)! Massa fofinha, cobertura de farofa crocante e frutas como banana ou maçã.'
+    },
+    {
+      id:4, cat:'culinaria',
+      type:'img-question',
+      text:'Qual é essa sobremesa folhada de origem austríaca, famosa em Brusque?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Apfelstrudel_mit_Vanillesosse.jpg/640px-Apfelstrudel_mit_Vanillesosse.jpg',
+      imageFallback:'🥐',
+      options:[
+        {label:'🥐 Strudel de Maçã',correct:true},
+        {label:'🎂 Cuca',correct:false},
+        {label:'🥐 Croissant',correct:false},
+        {label:'🍞 Pretzel',correct:false},
+      ],
+      tipCorrect:'Correto! O Apfelstrudel (Strudel de Maçã) é uma sobremesa folhada austríaca, recheada com maçã, canela e açúcar.',
+      tipWrong:'Essa sobremesa é o Strudel de Maçã (Apfelstrudel)! Massa folhada recheada com maçã, canela e açúcar — delicioso!'
+    },
+    {
+      id:5, cat:'culinaria',
+      type:'img-question',
+      text:'Qual é esse prato típico alemão muito servido na Fenarreco de Brusque?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Eisbein_mit_Sauerkraut.jpg/640px-Eisbein_mit_Sauerkraut.jpg',
+      imageFallback:'🍖',
+      options:[
+        {label:'🍖 Eisbein (Joelho de Porco)',correct:true},
+        {label:'🌭 Salsicha',correct:false},
+        {label:'🍗 Marreco Crispy',correct:false},
+        {label:'🥩 Costela',correct:false},
+      ],
+      tipCorrect:'Muito bem! O Eisbein é o joelho de porco cozido, herança direta das tavernas alemãs. É um clássico da Fenarreco!',
+      tipWrong:'Esse prato é o Eisbein — joelho de porco cozido e servido com chucrute. Uma das delícias da culinária alemã em Brusque!'
+    },
+
+    /* ── CULTURA (5) ── */
+    {
+      id:6, cat:'cultura',
+      type:'img-options',
+      text:'Qual dessas festas é a mais famosa de Brusque?',
+      image:null,imageFallback:null,
+      options:[
+        {label:'Fenarreco',correct:true,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Fenarreco_Brusque_SC.jpg/400px-Fenarreco_Brusque_SC.jpg',emoji:'🦆'},
+        {label:'Oktoberfest',correct:false,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Oktoberfest_2016_in_Munich.jpg/400px-Oktoberfest_2016_in_Munich.jpg',emoji:'🍺'},
+        {label:'Festa Junina',correct:false,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Festa_junina_alagoana.jpg/400px-Festa_junina_alagoana.jpg',emoji:'🎪'},
+      ],
+      tipCorrect:'Correto! A Fenarreco (Festa Nacional do Marreco) é a festa símbolo de Brusque, criada em 1986 e realizada todo outubro com 150 mil visitantes!',
+      tipWrong:'A resposta certa é a Fenarreco — Festa Nacional do Marreco! Criada em 1986, é o maior evento cultural de Brusque.'
+    },
+    {
+      id:7, cat:'cultura',
+      type:'img-question',
+      text:'Qual é essa famosa igreja de Brusque, projetada pelo arquiteto alemão Gottfried Böhm?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Igreja_s%C3%A3o_luis_gonzaga_brusque_SC.jpg/640px-Igreja_s%C3%A3o_luis_gonzaga_brusque_SC.jpg',
+      imageFallback:'⛪',
+      options:[
+        {label:'⛪ Igreja São Luís Gonzaga',correct:true},
+        {label:'⛪ Santuário de Azambuja',correct:false},
+        {label:'🕌 Catedral da Sé',correct:false},
+        {label:'⛪ Igreja Luterana',correct:false},
+      ],
+      tipCorrect:'Perfeito! A Igreja Matriz São Luís Gonzaga foi projetada por Gottfried Böhm, único alemão a ganhar o Prêmio Pritzker (o Nobel da Arquitetura), inaugurada em 1962.',
+      tipWrong:'Essa é a Igreja Matriz São Luís Gonzaga, projetada pelo arquiteto Gottfried Böhm (Prêmio Pritzker 1986). Construída em granito da região!'
+    },
+    {
+      id:8, cat:'cultura',
+      type:'img-question',
+      text:'Brusque é conhecida como "Cidade dos Tecidos". Qual setor industrial a tornou famosa?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Fabric_store_in_Brusque.jpg/640px-Fabric_store_in_Brusque.jpg',
+      imageFallback:'🧵',
+      options:[
+        {label:'🧵 Indústria Têxtil',correct:true},
+        {label:'🚗 Indústria Automotiva',correct:false},
+        {label:'💻 Tecnologia',correct:false},
+        {label:'⚗️ Petroquímica',correct:false},
+      ],
+      tipCorrect:'Isso! Brusque é o "Berço da Fiação Catarinense". Em 1892, Carlos Renaux fundou a 1ª indústria têxtil de Santa Catarina aqui!',
+      tipWrong:'Brusque é famosa pela Indústria Têxtil! É o "Berço da Fiação Catarinense" — em 1892 surgiu aqui a 1ª fábrica de tecidos de Santa Catarina.'
+    },
+    {
+      id:9, cat:'cultura',
+      type:'img-question',
+      text:'Qual é esse parque de Brusque, considerado o maior acervo de esculturas em mármore a céu aberto da América do Sul?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Parque_Escultura_Brusque.jpg/640px-Parque_Escultura_Brusque.jpg',
+      imageFallback:'🗿',
+      options:[
+        {label:'🗿 Parque das Esculturas Ilse Teske',correct:true},
+        {label:'🌿 Parque Zoobotânico',correct:false},
+        {label:'🌳 Parque Leopoldo Moritz',correct:false},
+        {label:'🏛️ Museu Dom Joaquim',correct:false},
+      ],
+      tipCorrect:'Correto! O Parque das Esculturas Ilse Teske tem 40 obras em mármore de artistas internacionais a céu aberto. É gratuito e único na América do Sul!',
+      tipWrong:'Esse é o Parque das Esculturas Ilse Teske! 40 obras em mármore de artistas internacionais a céu aberto — o maior da América do Sul.'
+    },
+    {
+      id:10, cat:'cultura',
+      type:'img-options',
+      text:'Qual é o principal povo europeu que colonizou Brusque, deixando marcas na culinária e arquitetura?',
+      image:null,imageFallback:null,
+      options:[
+        {label:'Alemães',correct:true,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/320px-Flag_of_Germany.svg.png',emoji:'🇩🇪'},
+        {label:'Portugueses',correct:false,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_Portugal.svg/320px-Flag_of_Portugal.svg.png',emoji:'🇵🇹'},
+        {label:'Espanhóis',correct:false,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/320px-Flag_of_Spain.svg.png',emoji:'🇪🇸'},
+      ],
+      tipCorrect:'Exato! Foram os imigrantes alemães vindos do Grão-Ducado de Baden que fundaram Brusque em 1860. Depois vieram italianos e poloneses.',
+      tipWrong:'Foram os Alemães que colonizaram Brusque em 1860! O Barão von Schneeburg liderou 54 imigrantes do Grão-Ducado de Baden.'
+    },
+
+    /* ── HISTÓRIA (5) ── */
+    {
+      id:11, cat:'historia',
+      type:'img-question',
+      text:'Em que ano foi fundada a cidade de Brusque?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Brusque-SC.jpg/640px-Brusque-SC.jpg',
+      imageFallback:'🏙️',
+      options:[
+        {label:'📅 1860',correct:true},
+        {label:'📅 1850',correct:false},
+        {label:'📅 1875',correct:false},
+        {label:'📅 1900',correct:false},
+      ],
+      tipCorrect:'Correto! Em 4 de agosto de 1860, 54 imigrantes alemães liderados pelo Barão von Schneeburg fundaram a Colônia Itajahy, que mais tarde se tornaria Brusque.',
+      tipWrong:'Brusque foi fundada em 1860! Em 4 de agosto daquele ano, o Barão von Schneeburg chegou com 54 imigrantes alemães e fundou a Colônia Itajahy.'
+    },
+    {
+      id:12, cat:'historia',
+      type:'img-question',
+      text:'Em homenagem a quem a cidade recebeu o nome "Brusque" em 1890?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Francisco_Carlos_de_Ara%C3%BAjo_Brusque.jpg/400px-Francisco_Carlos_de_Ara%C3%BAjo_Brusque.jpg',
+      imageFallback:'🎩',
+      options:[
+        {label:'🎩 Francisco Carlos de Araújo Brusque',correct:true},
+        {label:'👑 Barão von Schneeburg',correct:false},
+        {label:'🏭 Carlos Renaux',correct:false},
+        {label:'⛪ São Luís Gonzaga',correct:false},
+      ],
+      tipCorrect:'Perfeito! O nome Brusque homenageia Francisco Carlos de Araújo Brusque, presidente da Província de Santa Catarina quando a colônia foi fundada.',
+      tipWrong:'A cidade foi batizada de "Brusque" em homenagem a Francisco Carlos de Araújo Brusque, presidente da Província de Santa Catarina na época da fundação.'
+    },
+    {
+      id:13, cat:'historia',
+      type:'img-question',
+      text:'Em que rio os primeiros colonos remaram de canoa até chegar ao local de Brusque?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Rio_Itaja%C3%AD_Mirim_em_Brusque.jpg/640px-Rio_Itaja%C3%AD_Mirim_em_Brusque.jpg',
+      imageFallback:'🏞️',
+      options:[
+        {label:'🏞️ Rio Itajaí-Mirim',correct:true},
+        {label:'🌊 Rio Paraná',correct:false},
+        {label:'💧 Rio Blumenau',correct:false},
+        {label:'🌿 Rio Uruguai',correct:false},
+      ],
+      tipCorrect:'Isso! Os colonos remaram rio acima no Itajaí-Mirim em canoas por cinco dias até chegar ao local "Vicente Só", onde fundaram a colônia.',
+      tipWrong:'Foi o Rio Itajaí-Mirim! Os 54 colonos alemães remaram durante 5 dias nesse rio em canoas até chegarem ao local da fundação de Brusque.'
+    },
+    {
+      id:14, cat:'historia',
+      type:'img-question',
+      text:'Qual foi o nome original dado à colônia fundada em 1860, antes de se chamar Brusque?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Brusque_centro_hist%C3%B3rico.jpg/640px-Brusque_centro_hist%C3%B3rico.jpg',
+      imageFallback:'🗺️',
+      options:[
+        {label:'🗺️ Colônia Itajahy',correct:true},
+        {label:'🏘️ Colônia São Luís',correct:false},
+        {label:'🌿 Colônia Vale Verde',correct:false},
+        {label:'🦆 Colônia Schneeburg',correct:false},
+      ],
+      tipCorrect:'Correto! O núcleo original foi batizado de "Colônia Itajahy" pelos fundadores em 1860. O nome Brusque só veio em 1890.',
+      tipWrong:'O nome original era Colônia Itajahy! Só em 17 de janeiro de 1890 a cidade ganhou o nome de Brusque, em homenagem ao presidente da Província.'
+    },
+    {
+      id:15, cat:'historia',
+      type:'img-question',
+      text:'Em 1892, qual empresário fundou a 1ª indústria têxtil de Santa Catarina em Brusque?',
+      image:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Fabrica_Renaux_Brusque.jpg/640px-Fabrica_Renaux_Brusque.jpg',
+      imageFallback:'🏭',
+      options:[
+        {label:'🏭 Carlos Renaux',correct:true},
+        {label:'🎩 Barão von Schneeburg',correct:false},
+        {label:'🧵 João Bauer',correct:false},
+        {label:'🔨 João Koerich',correct:false},
+      ],
+      tipCorrect:'Exato! Carlos Renaux instalou os primeiros teares em 1892 com ajuda de tecelões poloneses de Łódź, dando início à maior tradição industrial de Brusque!',
+      tipWrong:'Foi Carlos Renaux! Em 1892 ele instalou teares rústicos de madeira com ajuda de tecelões poloneses, fundando a 1ª indústria têxtil de Santa Catarina.'
+    },
+  ];
+
+  // Configuração de cada categoria
+  const CATS = {
+    culinaria: { label:'🍽️ Culinária', emoji:'🍽️', msg:'Agora: Cultura!',  desc:'Você passou pela Culinária! Hora de testar seus conhecimentos sobre a cultura de Brusque.' },
+    cultura:   { label:'🎭 Cultura',   emoji:'🎭', msg:'Agora: História!', desc:'Ótimo! Seção de Cultura concluída. Agora vamos mergulhar na história de Brusque!' },
+    historia:  { label:'📜 História',  emoji:'📜', msg:'', desc:'' },
+  };
+
+  // Estado do jogo
+  const state = {
+    name:'', school:'', age:'',
+    qi: 0,
+    score: 0,
+    catScore: { culinaria:0, cultura:0, historia:0 },
+    answers: [],
+  };
+
+  // Atalhos
+  const $ = id => document.getElementById(id);
+  const ss = id => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $(id).classList.add('active');
+  };
+
+  function shake(id) {
+    const el = $(id);
+    el.style.borderColor = 'var(--red)';
+    setTimeout(() => { el.style.borderColor = ''; }, 1200);
+  }
+
+  // Navegação inicial
+  function goSchool() {
+    const v = $('inp-name').value.trim();
+    if (!v) { shake('inp-name'); return; }
+    state.name = v; ss('s-school');
+  }
+  function goAge() {
+    const v = $('inp-school').value.trim();
+    if (!v) { shake('inp-school'); return; }
+    state.school = v; ss('s-age');
+  }
+  function startQuiz() {
+    const v = $('inp-age').value.trim();
+    if (!v) { shake('inp-age'); return; }
+    state.age = v;
+    state.qi = 0; state.score = 0;
+    state.catScore = { culinaria:0, cultura:0, historia:0 };
+    state.answers = [];
+    $('badge-name').textContent = state.name;
+    renderQuestion();
+    ss('s-question');
+  }
+
+  // Renderiza a pergunta atual na tela
+  function renderQuestion() {
+    const q = QUESTIONS[state.qi];
+
+    // Atualiza progresso
+    const pct = (state.qi / 15) * 100;
+    $('progress-bar').style.width = pct + '%';
+    $('progress-bar').className = 'progress-bar ' + q.cat;
+    $('prog-label').textContent = `Pergunta ${state.qi + 1} de 15`;
+    $('prog-cat-label').textContent = CATS[q.cat].label;
+    $('badge-score').textContent = state.score;
+
+    // Label da categoria
+    const lbl = $('q-label');
+    lbl.textContent = CATS[q.cat].label + ' · P' + getCatIndex(state.qi);
+    lbl.className = 'q-label ' + q.cat;
+
+    $('q-text').textContent = q.text;
+
+    // Imagem da pergunta
+    const imgWrap = $('q-img-wrap');
+    if (q.image) {
+      imgWrap.innerHTML = `
+        <div class="q-image-wrap">
+          <img src="${q.image}" alt="Imagem da pergunta"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+               style="opacity:0;transition:opacity .3s;"
+               onload="this.style.opacity='1'" />
+          <span class="emoji-fallback" style="display:none">${q.imageFallback || ''}</span>
+        </div>`;
+    } else {
+      imgWrap.innerHTML = '';
+    }
+
+    // Opções de resposta
+    const wrap = $('opts-wrap');
+    wrap.innerHTML = '';
+
+    if (q.type === 'img-options') {
+      // Opções com imagem
+      const grid = document.createElement('div');
+      grid.className = 'opts-img' + (q.options.length === 2 ? ' two' : '');
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-img';
+        btn.innerHTML = `
+          <div class="opt-photo">
+            <img src="${opt.img}" alt="${opt.label}"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                 style="opacity:0;transition:opacity .3s;"
+                 onload="this.style.opacity='1'" />
+            <div class="ep" style="display:none">${opt.emoji || '❓'}</div>
+          </div>
+          <span class="opt-name">${opt.label}</span>`;
+        btn.onclick = () => select(btn, opt.correct, q);
+        grid.appendChild(btn);
+      });
+      wrap.appendChild(grid);
+    } else {
+      // Opções de texto
+      const grid = document.createElement('div');
+      grid.className = q.options.length === 3 ? 'opts-text three' : 'opts-text';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-text';
+        btn.textContent = opt.label;
+        btn.onclick = () => select(btn, opt.correct, q);
+        grid.appendChild(btn);
+      });
+      wrap.appendChild(grid);
+    }
+  }
+
+  // Retorna o número da pergunta dentro da categoria (1, 2, 3...)
+  function getCatIndex(qi) {
+    const cat = QUESTIONS[qi].cat;
+    return QUESTIONS.slice(0, qi).filter(q => q.cat === cat).length + 1;
+  }
+
+  // Processa a resposta escolhida
+  function select(btn, isCorrect, q) {
+    // Desabilita todos os botões
+    const todos = btn.closest('.opts-img, .opts-text').querySelectorAll('button');
+    todos.forEach(b => b.disabled = true);
+
+    state.answers.push({ cat: q.cat, text: q.text, correct: isCorrect });
+
+    if (isCorrect) {
+      btn.classList.add('opt-correct');
+      state.score++;
+      state.catScore[q.cat]++;
+      $('tip-correct').textContent = q.tipCorrect;
+      setTimeout(() => ss('s-correct'), 750);
+    } else {
+      btn.classList.add('opt-wrong');
+      $('tip-wrong').textContent = q.tipWrong;
+      setTimeout(() => ss('s-wrong'), 750);
+    }
+  }
+
+  // Avança para a próxima pergunta (chamado pelos botões de feedback)
+  function nextQ() {
+    state.qi++;
+
+    // Acabou o quiz
+    if (state.qi >= QUESTIONS.length) {
+      showResult();
+      return;
+    }
+
+    const q = QUESTIONS[state.qi];
+    const anterior = QUESTIONS[state.qi - 1].cat;
+
+    // Mudou de categoria: mostra tela de transição
+    if (anterior !== q.cat) {
+      mostrarTransicao(anterior, q.cat);
+      return;
+    }
+
+    // Mesma categoria: vai direto para a próxima pergunta
+    renderQuestion();
+    ss('s-question');
+  }
+
+  // Tela de transição entre categorias
+  function mostrarTransicao(catAnterior, proxCat) {
+    const nc = CATS[proxCat];
+    const banner = $('section-banner');
+    banner.className = 'section-banner ' + proxCat;
+    $('section-title').textContent = nc.emoji + ' ' + nc.msg;
+    $('section-desc').textContent = nc.desc;
+
+    const acertos = state.catScore[catAnterior];
+    const nomeCategoria = CATS[catAnterior].label.replace(/\S+\s/, '');
+    $('section-score-info').textContent = `Você acertou ${acertos} de 5 perguntas de ${nomeCategoria} 🎯`;
+
+    ss('s-section');
+  }
+
+  // Chamado pelo botão "Continuar" da transição
+  function resumeSection() {
+    renderQuestion();
+    ss('s-question');
+  }
+
+  // Tela de resultado final
+  function showResult() {
+    $('sc-food').textContent    = state.catScore.culinaria;
+    $('sc-culture').textContent = state.catScore.cultura;
+    $('sc-history').textContent = state.catScore.historia;
+    $('sc-total').textContent   = state.score;
+
+    const n = state.name, s = state.score;
+    let msg = '';
+    if (s === 15)    msg = `Incrível, ${n}! Pontuação perfeita! Você é expert em Brusque! 🌟`;
+    else if (s >= 12) msg = `Parabéns, ${n}! Você conhece muito bem a história e cultura de Brusque!`;
+    else if (s >= 9)  msg = `Bom trabalho, ${n}! Mas ainda tem muita história de Brusque para descobrir!`;
+    else if (s >= 6)  msg = `Vamos estudar mais, ${n}! Brusque tem muito para te ensinar!`;
+    else              msg = `Não desanime, ${n}! Que tal aprender mais sobre nossa cidade?`;
+    $('result-msg').textContent = msg;
+
+    ss('s-result');
+  }
+
+  // Tela de desempenho detalhado
+  function seeDetails() {
+    $('detail-player').innerHTML =
+      `👤 <strong>${state.name}</strong> &nbsp;·&nbsp; 🏫 ${state.school} &nbsp;·&nbsp; 🎂 ${state.age} anos`;
+
+    const dc = $('detail-content');
+    dc.innerHTML = '';
+
+    ['culinaria', 'cultura', 'historia'].forEach(cat => {
+      const respostas = state.answers.filter(a => a.cat === cat);
+      if (!respostas.length) return;
+
+      const secao = document.createElement('div');
+      secao.className = 'detail-section';
+
+      const cabecalho = document.createElement('div');
+      cabecalho.className = 'detail-header ' + cat;
+      cabecalho.textContent = CATS[cat].label + ` · ${state.catScore[cat]}/5 acertos`;
+      secao.appendChild(cabecalho);
+
+      respostas.forEach((a, i) => {
+        const linha = document.createElement('div');
+        linha.className = 'detail-row ' + (a.correct ? 'ok' : 'err');
+        linha.innerHTML = `<span style="font-size:1.1rem">${a.correct ? '✅' : '❌'}</span>
+          <span>P${i + 1}: ${a.correct ? 'Acertou!' : 'Errou'}</span>`;
+        secao.appendChild(linha);
+      });
+
+      dc.appendChild(secao);
+    });
+
+    ss('s-details');
+  }
+
+  // Reinicia o jogo
+  function restart() {
+    $('inp-name').value = ''; $('inp-school').value = ''; $('inp-age').value = '';
+    Object.assign(state, { name:'', school:'', age:'', qi:0, score:0, catScore:{culinaria:0,cultura:0,historia:0}, answers:[] });
+    $('progress-bar').style.width = '0%';
+    ss('s-name');
+  }
+
+  // Suporte à tecla Enter
+  $('inp-name').addEventListener('keydown',   e => { if (e.key === 'Enter') goSchool(); });
+  $('inp-school').addEventListener('keydown', e => { if (e.key === 'Enter') goAge(); });
+  $('inp-age').addEventListener('keydown',    e => { if (e.key === 'Enter') startQuiz(); });
+
+  // Flores decorativas no fundo
+  const FLORES = ['🌸','🌼','🌺','🌻','🌷','💐','🌹','🪷'];
+  const fw = document.getElementById('flowers');
+  for (let i = 0; i < 20; i++) {
+    const f = document.createElement('span');
+    f.className = 'flower';
+    f.textContent = FLORES[i % FLORES.length];
+    fw.appendChild(f);
+  }
+  </script>
+</body>
+</html>
