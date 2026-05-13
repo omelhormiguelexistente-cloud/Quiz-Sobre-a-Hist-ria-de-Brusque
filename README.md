@@ -1,24 +1,24 @@
-# 🐥 Quiz: Cultura de Brusque!
+#  Quiz: Cultura de Brusque!
 
 > Um jogo educativo e interativo sobre a história, cultura e culinária de Brusque — SC.
 
 ---
 
-## 📖 Sobre o projeto
+##  Sobre o projeto
 
 O **Quiz: Cultura de Brusque!** é um jogo de perguntas e respostas desenvolvido para estudantes que queiram aprender (ou testar seus conhecimentos) sobre a cidade de Brusque, em Santa Catarina. O projeto foi criado com HTML, CSS e JavaScript puro — sem frameworks ou bibliotecas externas — tornando o código simples, leve e fácil de entender.
 
 ---
 
-## 🎮 Como funciona
+##  Como funciona
 
 Ao abrir o jogo, o jogador informa seu **nome**, **escola** e **idade** antes de começar. Em seguida, enfrenta **15 perguntas divididas em 3 categorias**:
 
 | Categoria | Perguntas | Tema |
 |-----------|-----------|------|
-| 🍽️ Culinária | 5 | Pratos típicos da região, como o Marreco Recheado, Cuca e Strudel |
-| 🎭 Cultura | 5 | Festas, monumentos, indústria e a identidade cultural de Brusque |
-| 📜 História | 5 | Fundação da cidade, colonização alemã e personagens históricos |
+|  Culinária | 5 | Pratos típicos da região, como o Marreco Recheado, Cuca e Strudel |
+|  Cultura | 5 | Festas, monumentos, indústria e a identidade cultural de Brusque |
+|  História | 5 | Fundação da cidade, colonização alemã e personagens históricos |
 
 Entre cada categoria, uma **tela de transição** aparece com o resultado parcial e uma mensagem de incentivo antes de continuar.
 
@@ -28,7 +28,7 @@ No final, é exibida uma **tela de resultado** com a pontuação total e por cat
 
 ---
 
-## 🗂️ Estrutura do projeto
+##  Estrutura do projeto
 
 ```
 quiz-brusque/
@@ -39,7 +39,7 @@ O jogo inteiro está em um único arquivo `.html`, sem dependências externas al
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 - 15 perguntas com imagens reais (Wikimedia Commons)
 - Dois tipos de questão: texto e imagem nas opções
@@ -55,7 +55,7 @@ O jogo inteiro está em um único arquivo `.html`, sem dependências externas al
 
 ---
 
-## 🚀 Como usar
+##  Como usar
 
 Não é necessário instalar nada. Basta abrir o arquivo no navegador:
 
@@ -74,7 +74,7 @@ Ou simplesmente faça o download do arquivo `.html` e clique duas vezes para abr
 
 ---
 
-## 🛠️ Tecnologias utilizadas
+##  Tecnologias utilizadas
 
 - **HTML5** — estrutura das telas e elementos
 - **CSS3** — estilização, animações e layout responsivo
@@ -84,7 +84,7 @@ Ou simplesmente faça o download do arquivo `.html` e clique duas vezes para abr
 
 ---
 
-## 📸 Telas do jogo
+##  Telas do jogo
 
 | Tela | Descrição |
 |------|-----------|
@@ -98,24 +98,9 @@ Ou simplesmente faça o download do arquivo `.html` e clique duas vezes para abr
 
 ---
 
-## 🤝 Contribuindo
 
-Contribuições são bem-vindas! Se quiser adicionar novas perguntas, corrigir informações ou melhorar o visual, siga os passos:
-
-1. Faça um fork do repositório
-2. Crie uma branch para sua alteração (`git checkout -b minha-alteracao`)
-3. Faça o commit das mudanças (`git commit -m 'Descrição da alteração'`)
-4. Envie para o repositório remoto (`git push origin minha-alteracao`)
-5. Abra um Pull Request
-
----
-
-## 📝 Licença
+##  Licença
 
 Este projeto é de uso educativo e livre para adaptação. Sinta-se à vontade para usar em escolas, eventos ou projetos culturais sobre Brusque e região.
 
 ---
-
-<p align="center">
-  Feito com 💛 para os estudantes de Brusque — SC 🐥
-</p>
